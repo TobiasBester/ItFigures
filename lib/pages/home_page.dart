@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:it_figures/constants.dart';
+import 'package:it_figures/providers/game_providers.dart';
+import 'package:it_figures/widgets/show_timer_switch.dart';
 import 'package:it_figures/widgets/home_page_button.dart';
 
 class HomePage extends ConsumerStatefulWidget {
@@ -13,7 +15,6 @@ class HomePage extends ConsumerStatefulWidget {
 class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
         body: Center(
             child: Padding(
@@ -36,24 +37,30 @@ class _HomePageState extends ConsumerState<HomePage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                HomePageButton(onPressed: () => {
-                                  Navigator.pushNamed(context, '/daily')
-                                }, text: 'Daily'),
+                                HomePageButton(onPressed: () => _navigateToDaily(context, ref), text: 'Daily'),
                                 const SizedBox(height: 16),
-                                HomePageButton(onPressed: () => {
-                                  Navigator.pushNamed(context, '/timed')
-                                }, text: 'Timed'),
-                                const SizedBox(height: 16),
-                                HomePageButton(onPressed: () => {
-                                  Navigator.pushNamed(context, '/infinite')
-                                }, text: 'Infinite'),
+                                HomePageButton(onPressed: () => _navigateToInfinite(context, ref), text: 'Infinite'),
+                                const SizedBox(height: 32),
+                                const ShowTimerSwitch(),
                               ],
                             )),
                       ),
                       Text(APP_INSTRUCTIONS,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: Theme.of(context).colorScheme.onBackground,
-                          )),
+                                color: Theme.of(context).colorScheme.onBackground,
+                              )),
                     ]))));
   }
+}
+
+void _navigateToDaily(BuildContext context, WidgetRef ref) {
+  ref.read(gameTypeProvider.notifier).setGameType(GameType.daily);
+  ref.read(difficultyLevelProvider.notifier).update(0);
+  Navigator.of(context).pushNamed('/daily');
+}
+
+void _navigateToInfinite(BuildContext context, WidgetRef ref) {
+  ref.read(gameTypeProvider.notifier).setGameType(GameType.infinite);
+  ref.read(difficultyLevelProvider.notifier).update(0);
+  Navigator.of(context).pushNamed('/infinite');
 }

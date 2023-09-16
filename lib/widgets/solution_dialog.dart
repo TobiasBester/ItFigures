@@ -1,5 +1,9 @@
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:it_figures/constants.dart';
+import 'package:it_figures/providers/game_providers.dart';
+import 'package:it_figures/responsive_utils.dart';
+import 'package:it_figures/services/game_management.dart';
 
 class SolutionDialog extends ConsumerWidget {
   final bool ownSolution;
@@ -20,20 +24,56 @@ class SolutionDialog extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const Text('Solution here'),  // TODO
+                    const Text('Solution here'), // TODO
                     const SizedBox(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        baseButton(context, 'Next Level', true, null), // TODO
-                        baseButton(context, 'Share', true, null) // TODO
-                      ],
-                    ),
+                    actionButtons(context, ref),
                     const SizedBox(height: 16),
                     baseButton(context, 'Close', false, () => Navigator.of(context).pop())
                   ],
                 ))));
   }
+}
+
+Widget actionButtons(BuildContext context, WidgetRef ref) {
+  List<Widget> buttons = [
+    baseButton(context, 'Share', true, null), // TODO
+    const SizedBox(width: 16, height: 8),
+  ];
+
+  bool isInfinite = ref.read(gameTypeProvider) == GameType.infinite;
+  if (isInfinite) {
+    buttons.addAll([
+      baseButton(context, 'Another One', true, () {
+        anotherOne(ref);
+        Navigator.of(context).pop();
+      }),
+      const SizedBox(width: 16, height: 8)
+    ]);
+  }
+
+  if (ref.read(difficultyLevelProvider) < NUM_LEVELS - 1) {
+    buttons.add(baseButton(context, 'Next Level', true, () {
+      toNextLevel(ref);
+      Navigator.of(context).pop();
+    }));
+  }
+
+  Widget container = ResponsiveUtils.largeSmall(
+      context,
+      Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: buttons),
+      Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: buttons));
+
+  return container;
+}
+
+void toNextLevel(WidgetRef ref) {
+  int currentLevel = ref.read(difficultyLevelProvider);
+  updateLevel(ref, currentLevel + 1);
+}
+
+void anotherOne(WidgetRef ref) {
+  int currentLevel = ref.read(difficultyLevelProvider);
+  updateLevel(ref, currentLevel);
 }
 
 Text headerText(BuildContext context, String text) {

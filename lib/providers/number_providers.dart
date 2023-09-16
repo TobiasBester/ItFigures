@@ -1,18 +1,20 @@
-import 'dart:developer';
-
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:it_figures/models/operand_model.dart';
 import 'package:it_figures/models/operation_selection.dart';
 import 'package:it_figures/models/operator_model.dart';
+import 'package:it_figures/providers/game_providers.dart';
 import 'package:it_figures/services/number_generator.dart';
 import 'package:it_figures/services/number_generator_factory.dart';
 
 // OPERAND NUMBERS
 class OperandNumbersNotifier extends StateNotifier<List<Operand>> {
   OperandNumbersNotifier(int level, NumberGenerator numberGenerator)
-      : super(numberGenerator.getRandomNumberOperands(level));
+      : super([]);
 
-  void regenerate(int level, NumberGenerator numberGenerator) {
+  void regenerate(int level, GameType gameType) {
+    final numberGenerator = gameType == GameType.infinite
+        ? NumberGeneratorFactory.createRandom()
+        : NumberGeneratorFactory.createForToday();
     state = numberGenerator.getRandomNumberOperands(level);
   }
 
@@ -45,9 +47,12 @@ final operandNumbersProvider = StateNotifierProvider<OperandNumbersNotifier, Lis
 
 // TOTAL TARGET
 class TotalTargetNotifier extends StateNotifier<int> {
-  TotalTargetNotifier(int level, NumberGenerator numberGenerator) : super(numberGenerator.getRandomTotalTarget(level));
+  TotalTargetNotifier(int level, NumberGenerator numberGenerator) : super(0);
 
-  void regenerate(int level, NumberGenerator numberGenerator) {
+  void regenerate(int level, GameType gameType) {
+    final numberGenerator = gameType == GameType.infinite
+        ? NumberGeneratorFactory.createRandom()
+        : NumberGeneratorFactory.createForToday();
     state = numberGenerator.getRandomTotalTarget(level);
   }
 }
@@ -57,17 +62,6 @@ final totalTargetProvider = StateNotifierProvider<TotalTargetNotifier, int>((ref
   final numberGenerator = ref.watch(numberGeneratorProvider);
   return TotalTargetNotifier(level, numberGenerator);
 });
-
-// LEVEL
-class DifficultyLevelNotifier extends StateNotifier<int> {
-  DifficultyLevelNotifier() : super(0);
-
-  void update(int newLevel) {
-    state = newLevel;
-  }
-}
-
-final difficultyLevelProvider = StateNotifierProvider<DifficultyLevelNotifier, int>((ref) => DifficultyLevelNotifier());
 
 // NUMBER GENERATOR
 class NumberGeneratorNotifier extends StateNotifier<NumberGenerator> {

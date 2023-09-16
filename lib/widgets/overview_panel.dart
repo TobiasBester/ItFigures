@@ -1,27 +1,34 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:it_figures/constants.dart';
+import 'package:it_figures/providers/game_providers.dart';
+import 'package:it_figures/providers/home_screen_providers.dart';
 import 'package:it_figures/providers/number_providers.dart';
 import 'package:it_figures/responsive_utils.dart';
+import 'package:it_figures/services/game_management.dart';
+import 'package:it_figures/widgets/level_select.dart';
 import 'package:it_figures/widgets/solution_dialog.dart';
+import 'package:it_figures/widgets/time_elapsed.dart';
 
 class OverviewPanel extends ConsumerWidget {
   const OverviewPanel({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(totalTargetProvider);
+
     return SizedBox(
-        height: ResponsiveUtils.largeSmall(context, 240, 100),
-        width: ResponsiveUtils.largeSmall(context, 480, 320),
+        height: ResponsiveUtils.largeSmall(context, 240, 200),
+        width: ResponsiveUtils.largeSmall(context, 600, 320),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment:
               ResponsiveUtils.largeSmall(context, MainAxisAlignment.spaceAround, MainAxisAlignment.spaceBetween),
           children: [
-            Flexible(child: levelSelectRow(context, ref)),
-            Flexible(flex: 2, child: targetText(context, ref)),
-            Flexible(child: actionButtons(context, ref))
+            instructionText(context),
+            const Flexible(flex: 2, child: LevelSelect()),
+            Flexible(flex: 2, child: targetTextAndTimer(context, ref)),
+            Flexible(child: actionButtons(context, ref)),
           ],
         ));
   }
@@ -70,12 +77,6 @@ Widget actionButtons(BuildContext context, WidgetRef ref) {
               style: panelButtonStyles(context).copyWith(
                 color: Theme.of(context).colorScheme.onTertiary,
               ))),
-      FilledButton(
-          onPressed: () => _reset(ref),
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.error),
-          ),
-          child: Text('Reset', style: panelButtonStyles(context))),
       OutlinedButton(
           onPressed: () => _undo(ref),
           style: ButtonStyle(
@@ -85,6 +86,12 @@ Widget actionButtons(BuildContext context, WidgetRef ref) {
               style: panelButtonStyles(context).copyWith(
                 color: Theme.of(context).colorScheme.onTertiary,
               ))),
+      FilledButton(
+          onPressed: () => _reset(ref),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Theme.of(context).colorScheme.error),
+          ),
+          child: Text('Reset', style: panelButtonStyles(context))),
     ],
   );
 }
@@ -94,9 +101,7 @@ void _solution(BuildContext context, WidgetRef ref) {
 }
 
 void _reset(WidgetRef ref) {
-  ref.read(operandNumbersProvider.notifier).reset();
-  ref.read(operationResultsProvider.notifier).reset();
-  ref.read(operationSelectionProvider.notifier).reset();
+  resetAllStates(ref);
 }
 
 void _undo(WidgetRef ref) {
@@ -108,21 +113,39 @@ void _undo(WidgetRef ref) {
   }
 }
 
-Widget targetText(BuildContext context, WidgetRef ref) {
+Widget targetTextAndTimer(BuildContext context, WidgetRef ref) {
   int totalTarget = ref.read(totalTargetProvider);
-  String text =
+  String targetText =
       ResponsiveUtils.largeSmall(context, 'Target 🎯: ${totalTarget.toString()}', '🎯: ${totalTarget.toString()}');
 
-  final TextStyle? textStyle = ResponsiveUtils.largeSmall(
-      context, Theme.of(context).textTheme.displayMedium, Theme.of(context).textTheme.headlineSmall);
+  final TextStyle? targetTextStyle = ResponsiveUtils.largeSmall(
+      context, Theme.of(context).textTheme.displaySmall, Theme.of(context).textTheme.headlineSmall);
 
-  return Text(text,
-      style: textStyle?.copyWith(
-        color: Theme.of(context).colorScheme.onBackground,
-      ));
+  final List<Widget> widgets = [
+    Text(targetText,
+        style: targetTextStyle?.copyWith(
+          color: Theme.of(context).colorScheme.onBackground,
+        ))
+  ];
+
+  if (ref.read(showTimerProvider)) {
+    widgets.add(const ElapsedTime());
+  }
+
+  return Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: widgets);
 }
 
 TextStyle panelButtonStyles(BuildContext context) {
   return ResponsiveUtils.largeSmall(
       context, Theme.of(context).textTheme.bodyLarge!, Theme.of(context).textTheme.bodyMedium!);
+}
+
+Widget instructionText(BuildContext context) {
+  final TextStyle? textStyle = ResponsiveUtils.largeSmall(
+      context, Theme.of(context).textTheme.headlineSmall, Theme.of(context).textTheme.bodyLarge);
+
+  return Text(APP_INSTRUCTIONS,
+      style: textStyle?.copyWith(
+        color: Theme.of(context).colorScheme.onBackground,
+      ));
 }
