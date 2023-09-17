@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:it_figures/constants.dart';
 import 'package:it_figures/providers/game_providers.dart';
+import 'package:it_figures/providers/number_providers.dart';
 import 'package:it_figures/responsive_utils.dart';
 import 'package:it_figures/services/game_management.dart';
 
@@ -24,7 +25,7 @@ class SolutionDialog extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    const Text('Solution here'), // TODO
+                    solutionText(context, ref, ownSolution), // TODO: Show the user's solution if they got one
                     const SizedBox(height: 32),
                     actionButtons(context, ref),
                     const SizedBox(height: 16),
@@ -34,24 +35,39 @@ class SolutionDialog extends ConsumerWidget {
   }
 }
 
+Text solutionText(BuildContext context, WidgetRef ref, bool ownSolution) {
+  String text = '';
+  if (ownSolution) {
+    text = ref.read(operationResultsProvider.notifier).getSolutionText();
+  } else {
+    final currentLevelSolution = ref.read(currentLevelSolutionProvider);
+    text = currentLevelSolution!.tokenizedSolution.toString();
+  }
+
+  TextStyle textStyle = Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.onPrimary);
+
+  return Text(text, style: textStyle);
+}
+
 Widget actionButtons(BuildContext context, WidgetRef ref) {
   List<Widget> buttons = [
-    baseButton(context, 'Share', true, null), // TODO
-    const SizedBox(width: 16, height: 8),
+    baseButton(context, 'Share', true, null), // TODO: Implement share functionality
   ];
+  // TODO: Implement daily solution cache
 
   bool isInfinite = ref.read(gameTypeProvider) == GameType.infinite;
   if (isInfinite) {
     buttons.addAll([
+      const SizedBox(width: 16, height: 8),
       baseButton(context, 'Another One', true, () {
         anotherOne(ref);
         Navigator.of(context).pop();
       }),
-      const SizedBox(width: 16, height: 8)
     ]);
   }
 
   if (ref.read(difficultyLevelProvider) < NUM_LEVELS - 1) {
+    buttons.add(const SizedBox(width: 16, height: 8));
     buttons.add(baseButton(context, 'Next Level', true, () {
       toNextLevel(ref);
       Navigator.of(context).pop();

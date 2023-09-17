@@ -9,9 +9,10 @@ class NumberGeneratorFactory {
     return NumberGenerator.createSeeded(seed);
   }
 
-  static NumberGenerator createForToday() {
+  static NumberGenerator createForToday({int diff = 0}) {
     final now = DateTime.now();
     final lastMidnight = DateTime(now.year, now.month, now.day);
-    return NumberGenerator.createSeeded(lastMidnight.millisecondsSinceEpoch);
+    final seed = (lastMidnight.millisecondsSinceEpoch / 1000).floor() + diff;
+    return NumberGenerator.createSeeded(seed);
   }
 }

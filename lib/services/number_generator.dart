@@ -4,6 +4,7 @@ import 'package:it_figures/models/operand_model.dart';
 
 class NumberGenerator {
   static const int NUM_INITIAL_OPERANDS = 6;
+  static const int MAX_OPERAND_LIST_GENERATIONS = 10;
   static const List<int> HALF_MAX_OPERANDS = [10, 10, 25, 50, 50];
   static const List<int> MAX_OPERANDS = [25, 50, 50, 100, 100];
   static const List<int> MIN_TOTALS = [25, 100, 150, 250, 350];
@@ -43,7 +44,7 @@ class NumberGenerator {
       int maxAttempts = 100;
       bool reachedSmallQuota = numSmallRoundNumbersGenerated == levelConfig.numSmallRoundNumbers;
       bool reachedLargeQuota = numLargeRoundNumbersGenerated == levelConfig.numLargeRoundNumbers;
-      Operand operand = Operand(index, getQuotaAwareRandomNumber(level, reachedSmallQuota, reachedLargeQuota));
+      Operand operand = Operand(index, getQuotaAwareRandomNumber(level, reachedSmallQuota, reachedLargeQuota, maxAttempts));
       while (!isAdded && maxAttempts > 0) {
         maxAttempts--;
         if (!existingOperands.contains(operand.value)) {
@@ -59,7 +60,7 @@ class NumberGenerator {
           bool reachedSmallQuotaInner = numSmallRoundNumbersGenerated == levelConfig.numSmallRoundNumbers;
           bool reachedLargeQuotaInner = numLargeRoundNumbersGenerated == levelConfig.numLargeRoundNumbers;
           reseedRandom();
-          operand = Operand(index, getQuotaAwareRandomNumber(level, reachedSmallQuotaInner, reachedLargeQuotaInner));
+          operand = Operand(index, getQuotaAwareRandomNumber(level, reachedSmallQuotaInner, reachedLargeQuotaInner, maxAttempts));
         }
       }
       return operand;
@@ -73,16 +74,23 @@ class NumberGenerator {
     random = Random(seed);
   }
 
-  int getQuotaAwareRandomNumber(int level, bool reachedSmallQuota, bool reachedLargeQuota) {
+  int getQuotaAwareRandomNumber(int level, bool reachedSmallQuota, bool reachedLargeQuota, int seedVariance) {
     if (!reachedSmallQuota) {
       return getSmallRoundNumber();
     }
     if (!reachedLargeQuota) {
       return getLargeRoundNumber();
     }
-    return Random.secure().nextBool()
-      ? getRandomNumber(HALF_MAX_OPERANDS[level])
-      : getRandomNumber(MAX_OPERANDS[level]);
+    return getNextBool(seedVariance)
+        ? getRandomNumber(HALF_MAX_OPERANDS[level])
+        : getRandomNumber(MAX_OPERANDS[level]);
+  }
+
+  bool getNextBool(int seedVariance) {
+    random = Random(seed + (seedVariance * 5));
+    bool result = random.nextBool();
+    random = Random(seed - (seedVariance * 5));
+    return result;
   }
 
   int getRandomTotalTarget(int level) {

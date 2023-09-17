@@ -1,4 +1,5 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:it_figures/models/operation_solution.dart';
 
 class GameTypeNotifier extends StateNotifier<GameType> {
   GameTypeNotifier() : super(GameType.daily);
@@ -30,6 +31,17 @@ class DifficultyLevelNotifier extends StateNotifier<int> {
 }
 
 final difficultyLevelProvider = StateNotifierProvider<DifficultyLevelNotifier, int>((ref) => DifficultyLevelNotifier());
+
+class CurrentLevelSolutionNotifier extends StateNotifier<GameSolution?> {
+  CurrentLevelSolutionNotifier() : super(null);
+
+  void update(GameSolution newSolution) {
+    state = newSolution;
+  }
+}
+
+final currentLevelSolutionProvider =
+    StateNotifierProvider<CurrentLevelSolutionNotifier, GameSolution?>((ref) => CurrentLevelSolutionNotifier());
 
 class ElapsedTimeNotifier extends StateNotifier<Stopwatch> {
   ElapsedTimeNotifier() : super(Stopwatch());

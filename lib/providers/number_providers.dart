@@ -11,10 +11,10 @@ class OperandNumbersNotifier extends StateNotifier<List<Operand>> {
   OperandNumbersNotifier(int level, NumberGenerator numberGenerator)
       : super([]);
 
-  void regenerate(int level, GameType gameType) {
+  void regenerate(int level, GameType gameType, int diff) {
     final numberGenerator = gameType == GameType.infinite
         ? NumberGeneratorFactory.createRandom()
-        : NumberGeneratorFactory.createForToday();
+        : NumberGeneratorFactory.createForToday(diff: diff);
     state = numberGenerator.getRandomNumberOperands(level);
   }
 
@@ -49,10 +49,10 @@ final operandNumbersProvider = StateNotifierProvider<OperandNumbersNotifier, Lis
 class TotalTargetNotifier extends StateNotifier<int> {
   TotalTargetNotifier(int level, NumberGenerator numberGenerator) : super(0);
 
-  void regenerate(int level, GameType gameType) {
+  void regenerate(int level, GameType gameType, int diff) {
     final numberGenerator = gameType == GameType.infinite
         ? NumberGeneratorFactory.createRandom()
-        : NumberGeneratorFactory.createForToday();
+        : NumberGeneratorFactory.createForToday(diff: (10 * level) + diff);
     state = numberGenerator.getRandomTotalTarget(level);
   }
 }
@@ -147,10 +147,11 @@ class OperationResultsNotifier extends StateNotifier<List<OperationResult>> {
   void reset() {
     state = [];
   }
+
+  String getSolutionText() {
+    return state.map((operationResult) => operationResult.toString()).toList().join('\n');
+  }
 }
 
 final operationResultsProvider =
     StateNotifierProvider<OperationResultsNotifier, List<OperationResult>>((ref) => OperationResultsNotifier());
-
-// TODO: Implement generic solution checker which can work with any number of values
-// TODO: Implement difficulty selector

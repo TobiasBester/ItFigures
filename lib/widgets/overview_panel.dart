@@ -36,7 +36,6 @@ class OverviewPanel extends ConsumerWidget {
 
 Widget levelSelectRow(BuildContext context, WidgetRef ref) {
   int currentLevel = ref.read(difficultyLevelProvider);
-  // TODO: Make text buttons which change difficulty
   return Card(
     color: Theme.of(context).colorScheme.secondary,
     child: Row(

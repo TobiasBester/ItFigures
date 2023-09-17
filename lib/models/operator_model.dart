@@ -29,4 +29,17 @@ enum Operator {
         return operand1 ~/ operand2;
     }
   }
+
+  static fromString(String operatorText) {
+    switch (operatorText) {
+      case "+":
+        return Operator.plus;
+      case "-":
+        return Operator.minus;
+      case "×":
+        return Operator.multiply;
+      case "÷":
+        return Operator.divide;
+    }
+  }
 }
