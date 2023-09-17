@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:it_figures/constants.dart';
 import 'package:it_figures/providers/game_providers.dart';
@@ -27,7 +28,7 @@ class SolutionDialog extends ConsumerWidget {
                   children: [
                     solutionText(context, ref, ownSolution), // TODO: Show the user's solution if they got one
                     const SizedBox(height: 32),
-                    actionButtons(context, ref),
+                    actionButtons(context, ref, ownSolution),
                     const SizedBox(height: 16),
                     baseButton(context, 'Close', false, () => Navigator.of(context).pop())
                   ],
@@ -44,16 +45,22 @@ Text solutionText(BuildContext context, WidgetRef ref, bool ownSolution) {
     text = currentLevelSolution!.tokenizedSolution.toString();
   }
 
-  TextStyle textStyle = Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.onPrimary);
+  TextStyle textStyle =
+      Theme.of(context).textTheme.headlineSmall!.copyWith(color: Theme.of(context).colorScheme.onPrimary);
 
   return Text(text, style: textStyle);
 }
 
-Widget actionButtons(BuildContext context, WidgetRef ref) {
-  List<Widget> buttons = [
-    baseButton(context, 'Share', true, null), // TODO: Implement share functionality
-  ];
+Widget actionButtons(BuildContext context, WidgetRef ref, bool ownSolution) {
+  List<Widget> buttons = [];
   // TODO: Implement daily solution cache
+
+  if (ownSolution && ref.read(gameTypeProvider) == GameType.daily) {
+    buttons.add(baseButton(context, 'Share', true, () {
+      shareSolution(context, ref);
+      Navigator.of(context).pop();
+    }));
+  }
 
   bool isInfinite = ref.read(gameTypeProvider) == GameType.infinite;
   if (isInfinite) {
@@ -80,6 +87,17 @@ Widget actionButtons(BuildContext context, WidgetRef ref) {
       Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: buttons));
 
   return container;
+}
+
+void shareSolution(BuildContext context, WidgetRef ref) {
+  final solutionText = ref.read(operationResultsProvider.notifier).getSolutionText();
+  final level = ref.read(difficultyLevelProvider);
+  final sharedText = 'I solved level ${level + 1} of today\'s $APP_TITLE game!\n'
+      '$solutionText\n'
+      'Play $APP_TITLE for free online at $APP_URL';
+  Clipboard.setData(ClipboardData(text: sharedText)).then((_) {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copied to clipboard!')));
+  });
 }
 
 void toNextLevel(WidgetRef ref) {
