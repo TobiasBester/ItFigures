@@ -65,20 +65,25 @@ Widget actionButtons(BuildContext context, WidgetRef ref, bool ownSolution) {
   bool isInfinite = ref.read(gameTypeProvider) == GameType.infinite;
   if (isInfinite) {
     buttons.addAll([
-      const SizedBox(width: 16, height: 8),
       baseButton(context, 'Another One', true, () {
-        anotherOne(ref);
-        Navigator.of(context).pop();
+        anotherOne(ref).then((val) {
+          Navigator.of(context).pop();
+        });
       }),
     ]);
   }
 
   if (ref.read(difficultyLevelProvider) < NUM_LEVELS - 1) {
-    buttons.add(const SizedBox(width: 16, height: 8));
     buttons.add(baseButton(context, 'Next Level', true, () {
-      toNextLevel(ref);
-      Navigator.of(context).pop();
+      toNextLevel(ref).then((val) {
+        Navigator.of(context).pop();
+      });
     }));
+  }
+
+  int numButtons = buttons.length;
+  for (int i = 0; i < numButtons - 1; i++) {
+    buttons.insert(i + 1, const SizedBox(width: 16, height: 8));
   }
 
   Widget container = ResponsiveUtils.largeSmall(
@@ -100,14 +105,14 @@ void shareSolution(BuildContext context, WidgetRef ref) {
   });
 }
 
-void toNextLevel(WidgetRef ref) {
+Future<void> toNextLevel(WidgetRef ref) async {
   int currentLevel = ref.read(difficultyLevelProvider);
-  updateLevel(ref, currentLevel + 1);
+  return updateLevel(ref, currentLevel + 1);
 }
 
-void anotherOne(WidgetRef ref) {
+Future<void> anotherOne(WidgetRef ref) async {
   int currentLevel = ref.read(difficultyLevelProvider);
-  updateLevel(ref, currentLevel);
+  return updateLevel(ref, currentLevel);
 }
 
 Text headerText(BuildContext context, String text) {

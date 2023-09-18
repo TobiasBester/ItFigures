@@ -41,7 +41,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                                 const SizedBox(height: 16),
                                 HomePageButton(onPressed: () => _navigateToInfinite(context, ref), text: 'Infinite'),
                                 const SizedBox(height: 32),
-                                const ShowTimerSwitch(),
+                                // const ShowTimerSwitch(), // TODO: Unhide when this is sorted out
                               ],
                             )),
                       ),
@@ -56,11 +56,13 @@ class _HomePageState extends ConsumerState<HomePage> {
 void _navigateToDaily(BuildContext context, WidgetRef ref) {
   ref.read(gameTypeProvider.notifier).setGameType(GameType.daily);
   ref.read(difficultyLevelProvider.notifier).update(0);
+  ref.read(gameLoadingProvider.notifier).setLoading(true);
   Navigator.of(context).pushNamed('/daily');
 }
 
 void _navigateToInfinite(BuildContext context, WidgetRef ref) {
   ref.read(gameTypeProvider.notifier).setGameType(GameType.infinite);
   ref.read(difficultyLevelProvider.notifier).update(0);
+  ref.read(gameLoadingProvider.notifier).setLoading(true);
   Navigator.of(context).pushNamed('/infinite');
 }

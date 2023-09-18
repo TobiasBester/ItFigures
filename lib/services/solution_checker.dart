@@ -1,7 +1,5 @@
-import 'dart:developer';
-
+import 'package:it_figures/models/game_solution.dart';
 import 'package:it_figures/models/operand_model.dart';
-import 'package:it_figures/models/operation_solution.dart';
 import 'package:it_figures/models/possible_solution.dart';
 import "package:trotter/trotter.dart";
 

@@ -16,14 +16,19 @@ class LevelSelect extends ConsumerWidget {
       color: Theme.of(context).colorScheme.tertiary,
       margin: const EdgeInsets.all(0),
       child: SegmentedButton(
+        key: const Key('levelSelect'),
         segments: levelSegments(context, ref, currentLevel),
         selected: {currentLevel},
         showSelectedIcon: false,
         onSelectionChanged: (selection) {
-          updateLevel(ref, selection.first);
+          updateLevelSelect(ref, selection.first).then((value) => null);
         },
       ),
     );
+  }
+
+  Future<void> updateLevelSelect(WidgetRef ref, int newLevel) {
+    return updateLevel(ref, newLevel);
   }
 
   List<ButtonSegment> levelSegments(BuildContext context, WidgetRef ref, int currentLevel) {

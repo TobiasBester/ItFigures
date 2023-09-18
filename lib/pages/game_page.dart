@@ -30,10 +30,9 @@ class _GamePageState extends ConsumerState<GamePage> {
     final level = ref.read(difficultyLevelProvider);
 
     Future(() {
-      ref.read(gameLoadingProvider.notifier).setLoading(true);
       ref.read(gameTypeProvider.notifier).setGameType(widget.gameType);
 
-      regenerateAll(ref, level);
+      return regenerateAll(ref, level);
     }).then((value) {
       ref.read(gameLoadingProvider.notifier).setLoading(false);
     });
@@ -44,23 +43,26 @@ class _GamePageState extends ConsumerState<GamePage> {
     List<Operand> randomNumbers = ref.watch(operandNumbersProvider);
     final gameType = widget.gameType;
     final loading = ref.watch(gameLoadingProvider);
+    final size = MediaQuery.of(context).size;
 
-    return loading
-        ? const Center(child: CircularProgressIndicator())
-        : Scaffold(
-            appBar: AppBar(
-              title: Text('$APP_TITLE: ${gameType.name}'),
-            ),
-            body: Center(
-                child: Container(
-                    padding: _getPadding(context),
-                    child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          const Flexible(child: OverviewPanel()),
-                          actionArea(context, randomNumbers),
-                        ]))));
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('$APP_TITLE: ${gameType.name}'),
+          bottom: loading
+              ? PreferredSize(
+                  preferredSize: Size(size.width, 2), child: const LinearProgressIndicator(backgroundColor: Colors.red))
+              : null,
+        ),
+        body: Center(
+            child: Container(
+                padding: _getPadding(context),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Flexible(child: OverviewPanel()),
+                      actionArea(context, randomNumbers),
+                    ]))));
   }
 }
 

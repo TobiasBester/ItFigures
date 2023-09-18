@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:it_figures/models/operation_solution.dart';
+import 'package:it_figures/models/game_solution.dart';
+import 'package:it_figures/providers/home_screen_providers.dart';
+import 'package:it_figures/services/storage_service.dart';
 
 class GameTypeNotifier extends StateNotifier<GameType> {
   GameTypeNotifier() : super(GameType.daily);
@@ -53,14 +57,39 @@ class ElapsedTimeNotifier extends StateNotifier<Stopwatch> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  @override
-  void dispose() {
-    state.stop();
-    super.dispose();
-  }
 }
 
 final elapsedTimeProvider = StateNotifierProvider<ElapsedTimeNotifier, Stopwatch>((ref) => ElapsedTimeNotifier());
+
+class DailySolutionCacheNotifier extends StateNotifier<GameSolution?> {
+  final StorageService _storageService;
+
+  DailySolutionCacheNotifier(this._storageService) : super(null);
+
+  Future<GameSolution?> getSolutionForTodayAndLevel(int level) async {
+    final now = DateTime.now();
+    final lastMidnight = DateTime(now.year, now.month, now.day);
+    final day = lastMidnight.millisecondsSinceEpoch;
+    String dayLevelKey = 'solution-$day-$level';
+
+    final solutionText = await _storageService.read(dayLevelKey);
+    return solutionText != null ? GameSolution.fromJson(const JsonDecoder().convert(solutionText)) : null;
+  }
+
+  Future<void> saveSolutionForTodayAndLevel(int level, GameSolution gameSolution) async {
+    final now = DateTime.now();
+    final lastMidnight = DateTime(now.year, now.month, now.day);
+    final day = lastMidnight.millisecondsSinceEpoch;
+    String dayLevelKey = 'solution-$day-$level';
+
+    return _storageService.write(dayLevelKey, const JsonEncoder().convert(gameSolution.toJson()));
+  }
+}
+
+final dailySolutionCacheProvider = StateNotifierProvider<DailySolutionCacheNotifier, GameSolution?>((ref) {
+  final storageService = ref.watch(storageServiceProvider);
+  return DailySolutionCacheNotifier(storageService);
+});
 
 enum GameType {
   daily('Daily'),

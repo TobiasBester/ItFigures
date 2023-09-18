@@ -61,6 +61,13 @@ class TokenizedSolution {
     return runningTotal;
   }
 
+  TokenizedSolution.fromJson(Map<String, dynamic> json)
+      : elements = (json['elements'] as List<dynamic>).map((e) => e.toString()).toList();
+
+  Map<String, dynamic> toJson() => {
+        'elements': elements,
+      };
+
   @override
   String toString() {
     return elements.join(' ');

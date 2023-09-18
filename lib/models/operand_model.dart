@@ -34,10 +34,25 @@ class Operand implements Comparable<Operand> {
     hidden = false;
   }
 
+  Operand.fromJson(Map<String, dynamic> json) :
+    id = json['id'],
+    value = json['value'],
+    initialValue = json['initialValue'],
+    previousValues = [],
+    hidden = json['hidden'];
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'value': value,
+    'initialValue': initialValue,
+    'previousValues': previousValues,
+    'hidden': hidden,
+  };
+
   @override
   int compareTo(Operand other) {
     return id.compareTo(other.id);
-  } // 5, 2, 22, 14, 17, 20
+  }
 
   @override
   String toString() {
