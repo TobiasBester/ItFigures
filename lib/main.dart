@@ -22,7 +22,7 @@ class MyApp extends HookConsumerWidget {
     return MaterialApp(
       title: constants.APP_TITLE,
       theme: itFiguresThemeData,
-      color: Theme.of(context).colorScheme.background,
+      color: Theme.of(context).colorScheme.primary,
       routes: itFiguresRoutes,
       home: const HomePage(),
       // home: const MyHomePage(title: constants.APP_TITLE),
