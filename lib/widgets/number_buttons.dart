@@ -15,6 +15,7 @@ class NumberButtons extends ConsumerWidget {
 
     return Card(
         borderOnForeground: true,
+        color: Theme.of(context).colorScheme.primary,
         child: Container(
           alignment: Alignment.center,
           child: ResponsiveGridRow(

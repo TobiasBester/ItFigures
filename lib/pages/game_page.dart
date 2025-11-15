@@ -48,6 +48,8 @@ class _GamePageState extends ConsumerState<GamePage> {
     return Scaffold(
         appBar: AppBar(
           title: Text('$APP_TITLE: ${gameType.name}'),
+          backgroundColor: Theme.of(context).colorScheme.primary,
+          foregroundColor: Theme.of(context).colorScheme.onPrimary,
           bottom: loading
               ? PreferredSize(
                   preferredSize: Size(size.width, 2), child: const LinearProgressIndicator(backgroundColor: Colors.red))
