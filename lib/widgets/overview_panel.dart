@@ -109,6 +109,15 @@ void _undo(WidgetRef ref) {
     final lastResult = results.last;
     ref.read(operandNumbersProvider.notifier).undoOperation(lastResult.operand1Id, lastResult.operand2Id);
     ref.read(operationResultsProvider.notifier).removeLastResult();
+    ref.read(operationSelectionProvider.notifier).reset();
+
+    // Auto-select the previous result if there is one
+    if (results.length > 1) {
+      final previousResult = results[results.length - 2];
+      final operands = ref.read(operandNumbersProvider);
+      final previousResultOperand = operands.firstWhere((op) => op.id == previousResult.operand2Id);
+      ref.read(operationSelectionProvider.notifier).setNextOperand(previousResultOperand);
+    }
   }
 }
 

@@ -55,7 +55,14 @@ void addResult(BuildContext context, WidgetRef ref) {
   if (result != null) {
     checkIfSolved(context, ref);
     ref.read(operationResultsProvider.notifier).addResult(result);
+
+    // Find the operand that now contains the result (operand2 from the operation)
+    final operands = ref.read(operandNumbersProvider);
+    final resultOperand = operands.firstWhere((op) => op.id == result.operand2Id);
+
+    // Auto-select the result operand as operand1 for the next operation
     ref.read(operationSelectionProvider.notifier).reset();
+    ref.read(operationSelectionProvider.notifier).setNextOperand(resultOperand);
   }
 }
 
