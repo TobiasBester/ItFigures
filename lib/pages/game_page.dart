@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:it_figures/constants.dart';
 import 'package:it_figures/models/operand_model.dart';
 import 'package:it_figures/providers/game_providers.dart';
@@ -62,9 +63,27 @@ class _GamePageState extends ConsumerState<GamePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      if (gameType == GameType.daily) _buildDateDisplay(),
                       const Flexible(child: OverviewPanel()),
                       actionArea(context, randomNumbers),
                     ]))));
+  }
+
+  Widget _buildDateDisplay() {
+    final now = DateTime.now();
+    final formattedDate = DateFormat('EEEE, MMMM d, y').format(now);
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0, bottom: 4.0),
+      child: Text(
+        formattedDate,
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+        ),
+      ),
+    );
   }
 }
 
