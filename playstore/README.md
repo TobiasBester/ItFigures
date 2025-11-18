@@ -1,6 +1,8 @@
-# Play Store Assets Guide
+# Play Store Assets Guide (TWA)
 
-This directory contains all the assets and metadata needed for publishing to the Google Play Store.
+This directory contains all the assets and metadata needed for publishing your PWA to the Google Play Store using a Trusted Web Activity (TWA).
+
+**What is TWA?** A lightweight Android wrapper that displays your web app in fullscreen without browser UI. Your PWA remains the source of truth, and updates happen instantly when you update your website!
 
 ## Required Assets
 

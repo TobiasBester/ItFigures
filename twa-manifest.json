@@ -1,0 +1,44 @@
+{
+  "packageId": "com.coolandfunandnice.it_figures",
+  "host": "it-figures.web.app",
+  "name": "It Figures",
+  "launcherName": "It Figures",
+  "display": "standalone",
+  "themeColor": "#0175C2",
+  "navigationColor": "#0175C2",
+  "navigationColorDark": "#0175C2",
+  "navigationDividerColor": "#0175C2",
+  "navigationDividerColorDark": "#0175C2",
+  "backgroundColor": "#0175C2",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://it-figures.web.app/icons/Icon-512.png",
+  "maskableIconUrl": "https://it-figures.web.app/icons/Icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android/upload-keystore.jks",
+    "alias": "upload"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://it-figures.web.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": false
+    },
+    "playBilling": {
+      "enabled": false
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "targetSdkVersion": 34
+}
